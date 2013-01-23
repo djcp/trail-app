@@ -1,7 +1,3 @@
-$.fn.fromCache = function(url){
-  return false;
-};
-
 $.fn.showProgress = function(){
 };
 
@@ -72,7 +68,6 @@ $.fn.renderSteps = function(trail){
 }
 
 $.fn.trailTemplate = function(trail){
-  console.log(trail);
   var trail_content = $("<div class='trail'/>");
   $(trail_content).append(
     $("<h2/>").html(trail.name),
@@ -102,21 +97,22 @@ $.fn.renderTrail = function(trail_url){
 
 $.fn.getTrailUrls = function(){
   var trailListUrl = 'https://api.github.com/repos/thoughtbot/trail-map/contents/trails';
-/*  var fromCache = $().fromCache(trailListUrl);
-  if(fromCache){
-    $().populateTrailList(fromCache);
-    return;
-  }
-  */
 
-  $.ajax({
-    url: trailListUrl,
-    success: $().populateTrailList
-  })
+  chrome.storage.local.get('trailList', function(data){
+    if( Object.keys(data).length == 0 ){
+      $.ajax({
+        url: trailListUrl,
+        success: function(data, successCode, jqXHR){
+          $().populateTrailList(data, successCode, jqXHR)
+          chrome.storage.local.set({ 'trailList' : data }, function(){});
+        }
+      })
+    } else {
+      $().populateTrailList( data.trailList );
+    }
+  });
 
 };
-
-
 
 $(document).ready(
   function(){

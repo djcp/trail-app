@@ -13,6 +13,7 @@
     }
   },
   "permissions": [
+    "storage",
     "https://api.github.com/repos/thoughtbot/trail-map/contents/trails",
     "https://raw.github.com/thoughtbot/trail-map/master/trails/*"
   ]

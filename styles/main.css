@@ -62,6 +62,16 @@ ul.validations li{
   margin-left: 1em;
 }
 
+h3.step_header{
+  margin: 0;
+  padding: 1em;
+}
+
+h3.step_header:hover{
+  cursor: pointer;
+  background: #fcfcfc;
+}
+
 footer{
   text-align: center;
   margin: 2em;
