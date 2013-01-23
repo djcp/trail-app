@@ -1,0 +1,19 @@
+{
+  "name": "Trail-app",
+  "version": "1",
+  "manifest_version": 2,
+  "description": "thoughtbot trail maps",
+  "icons": {
+    "16": "icon-16.png",
+    "128": "icon-128.png"
+  },
+  "app": {
+    "background": {
+      "scripts": ["main.js"]
+    }
+  },
+  "permissions": [
+    "https://api.github.com/repos/thoughtbot/trail-map/contents/trails",
+    "https://raw.github.com/thoughtbot/trail-map/master/trails/*"
+  ]
+}

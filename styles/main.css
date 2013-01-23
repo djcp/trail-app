@@ -1,0 +1,71 @@
+html{
+  overflow: auto;
+}
+
+body{
+  margin: 0;
+  background: #f5f5f0;
+  font-family: helvetica, sans-serif;
+  color: #6c6a66;
+}
+
+header{
+  background: #d9d4cc url("images/learn-arrows.png") repeat-x left bottom;
+}
+
+header h1{
+  font-family: helvetica, sans-serif;
+  margin: 0;
+  color: white;
+  text-align: center;
+  padding: 1em;
+  font-size: 2em;
+  font-weight: bold;
+}
+
+header h1 img{
+  vertical-align: middle;
+}
+
+/* Trail defs */
+#trail_container{
+  padding: 1em;
+}
+
+.trail{
+  margin-bottom: 4em;
+}
+
+.trail h2{
+  margin: .25em 0em .5em 0em;
+  color: #C42107;
+}
+
+.trail .prerequisites {
+  font-size: smaller;
+  font-style: italic;
+  margin-bottom: .5em;
+}
+
+.trail .prerequisites span{
+  font-weight: bold;
+  margin-right: 2em;
+}
+
+.trail .content{
+  margin: 0 1em 0 1em;
+}
+
+ul.validations li{
+  font-size: smaller;
+  list-style: none;
+  margin-left: 1em;
+}
+
+footer{
+  text-align: center;
+  margin: 2em;
+  font-style: italic;
+  font-size: smaller;
+  color: #ccc;
+}
