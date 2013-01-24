@@ -10,7 +10,7 @@ $.fn.populateTrailList = function(data, successCode, jqXHR){
       $().getTrail(trail.html_url);
     }
   });
-};
+}
 
 $.fn.rawifyUrl = function(url){
   var raw_url = url.replace(/trail-map\/blob/,'trail-map');
@@ -99,18 +99,17 @@ $.fn.getTrail = function(trail_url){
           $().initTrail(data);
           var toStore = {};
           toStore[raw_url] = data;
-          chrome.storage.local.set(toStore, function(){});
+          chrome.storage.local.set(toStore);
         }
       })
     } else {
       $().initTrail(data[raw_url]);
     }
   })
-};
+}
 
 $.fn.getTrailUrls = function(){
   var trailListUrl = 'https://api.github.com/repos/thoughtbot/trail-map/contents/trails';
-
   chrome.storage.local.get(trailListUrl, function(data){
     if( Object.keys(data).length == 0 ){
       $.ajax({
@@ -119,19 +118,40 @@ $.fn.getTrailUrls = function(){
           $().populateTrailList(data, successCode, jqXHR)
           var toStore = {};
           toStore[trailListUrl] = data;
-          chrome.storage.local.set(toStore, function(){});
+          chrome.storage.local.set(toStore);
         }
       })
     } else {
       $().populateTrailList( data[trailListUrl] );
     }
   });
+}
 
-};
+$.fn.checkForNewCommit = function(){
+  $.ajax({
+    url: 'https://api.github.com/repos/thoughtbot/trail-map/commits',
+    success: function(commits, successCode, jqXHR){
+      var current_commit = commits[0]['sha'];
+      chrome.storage.local.get('lastCommitSha', function(last_commit){
+        if(last_commit['lastCommitSha'] != current_commit){
+          chrome.storage.local.clear(function(){
+            chrome.storage.local.set({ lastCommitSha : current_commit })
+          });
+        }
+      });
+    },
+    complete: function(){
+      $().getTrailUrls()
+    }
+  });
+}
+
 
 $(document).ready(
   function(){
-    var trail_urls = $().getTrailUrls();
+
+    $().checkForNewCommit();
+
     $(document).on('click', '.step_header', function(e){
       e.preventDefault();
       $(this).next().slideToggle();
