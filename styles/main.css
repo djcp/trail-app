@@ -9,6 +9,15 @@ body{
   color: #6c6a66;
 }
 
+a{
+  text-decoration: none;
+  color: #ad141e;
+}
+
+a:hover{
+  text-decoration: underline;
+}
+
 header{
   background: #d9d4cc url("images/learn-arrows.png") repeat-x left bottom;
 }
@@ -52,14 +61,13 @@ header h1 img{
   margin-right: 2em;
 }
 
-.trail .content{
-  margin: 0 1em 0 1em;
+.step_content{
+  margin-left: 2em;
 }
 
 ul.validations li{
   font-size: smaller;
   list-style: none;
-  margin-left: 1em;
 }
 
 h3.step_header{

@@ -7,7 +7,7 @@ $.fn.hideProgress = function(){
 $.fn.populateTrailList = function(data, successCode, jqXHR){
   $(data).each(function(i, trail){
     if(trail.url.match(/.+\.json$/)){
-      $().renderTrail(trail.html_url);
+      $().getTrail(trail.html_url);
     }
   });
 };
@@ -29,7 +29,7 @@ $.fn.renderStepResources = function(step){
     var output = $('<ul />');
     $.each(step.resources, function(i,resource){
       $(output).append(
-        $('<li />').append($('<a target="_blank" />').attr('href', resource.uri).html(resource.title)) 
+        $('<li />').append($('<a target="_blank" />').attr('href', resource.uri).text(resource.title))
       );
     })
     return output;
@@ -42,7 +42,7 @@ $.fn.renderStepValidations = function(step){
     var header = "<h4>You should be able to:</h4>";
     var output = $('<ul class="validations" />');
     $.each(step.validations, function(i, validation){
-      $(output).append($('<li/>').html(validation));
+      $(output).append($('<li />').text(validation));
     });
     return  [header , output];
   }
@@ -55,7 +55,7 @@ $.fn.renderSteps = function(trail){
     $.each(trail.steps, function(i, step){
       $(output).append(
         $('<div class="step" />').append(
-          $("<h3 class='step_header' />").html(step.name),
+          $("<h3 class='step_header' />").text(step.name),
           $('<div class="step_content" style="display: none;" />').append(
             $.fn.renderStepResources(step),
             $.fn.renderStepValidations(step)
@@ -70,9 +70,9 @@ $.fn.renderSteps = function(trail){
 $.fn.trailTemplate = function(trail){
   var trail_content = $("<div class='trail'/>");
   $(trail_content).append(
-    $("<h2/>").html(trail.name),
+    $("<h2/>").text(trail.name),
     $().trailPrerequisitesTemplate(trail),
-    $("<div class='description'>").html(trail.description),
+    $("<div class='description'>").text(trail.description),
     $("<div class='content'/>").append(
       $().renderSteps(trail)
     )
@@ -80,17 +80,30 @@ $.fn.trailTemplate = function(trail){
   return trail_content;
 }
 
-$.fn.renderTrail = function(trail_url){
+$.fn.initTrail = function(data){
+  $(data).each(function(i, trail){
+    $('#trail_container').append(
+      $().trailTemplate(trail)
+    );
+  });
+}
+
+$.fn.getTrail = function(trail_url){
   var raw_url = $().rawifyUrl(trail_url);
-  $.ajax({
-    url: raw_url,
-    dataType: 'json',
-    success: function(data, successCode, jqXHR){
-      $(data).each(function(i, trail){
-        $('#trail_container').append(
-          $().trailTemplate(trail)
-        );
-      });
+  chrome.storage.local.get(raw_url, function(data){
+    if( Object.keys(data).length == 0){
+      $.ajax({
+        url: raw_url,
+        dataType: 'json',
+        success: function(data, successCode, jqXHR){
+          $().initTrail(data);
+          var toStore = {};
+          toStore[raw_url] = data;
+          chrome.storage.local.set(toStore, function(){});
+        }
+      })
+    } else {
+      $().initTrail(data[raw_url]);
     }
   })
 };
@@ -98,17 +111,19 @@ $.fn.renderTrail = function(trail_url){
 $.fn.getTrailUrls = function(){
   var trailListUrl = 'https://api.github.com/repos/thoughtbot/trail-map/contents/trails';
 
-  chrome.storage.local.get('trailList', function(data){
+  chrome.storage.local.get(trailListUrl, function(data){
     if( Object.keys(data).length == 0 ){
       $.ajax({
         url: trailListUrl,
         success: function(data, successCode, jqXHR){
           $().populateTrailList(data, successCode, jqXHR)
-          chrome.storage.local.set({ 'trailList' : data }, function(){});
+          var toStore = {};
+          toStore[trailListUrl] = data;
+          chrome.storage.local.set(toStore, function(){});
         }
       })
     } else {
-      $().populateTrailList( data.trailList );
+      $().populateTrailList( data[trailListUrl] );
     }
   });
 
