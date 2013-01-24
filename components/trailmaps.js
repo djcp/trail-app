@@ -1,8 +1,10 @@
 $.fn.showProgress = function(){
-};
+  $('#spinner').show()
+}
 
 $.fn.hideProgress = function(){
-};
+  $('#spinner').hide()
+}
 
 $.fn.populateTrailList = function(data, successCode, jqXHR){
   $(data).each(function(i, trail){
@@ -95,12 +97,14 @@ $.fn.getTrail = function(trail_url){
       $.ajax({
         url: raw_url,
         dataType: 'json',
+        beforeSend: $().showProgress,
         success: function(data, successCode, jqXHR){
           $().initTrail(data);
           var toStore = {};
           toStore[raw_url] = data;
           chrome.storage.local.set(toStore);
-        }
+        },
+        complete: $().hideProgress
       })
     } else {
       $().initTrail(data[raw_url]);
@@ -114,12 +118,14 @@ $.fn.getTrailUrls = function(){
     if( Object.keys(data).length == 0 ){
       $.ajax({
         url: trailListUrl,
+        beforeSend: $().showProgress,
         success: function(data, successCode, jqXHR){
           $().populateTrailList(data, successCode, jqXHR)
           var toStore = {};
           toStore[trailListUrl] = data;
           chrome.storage.local.set(toStore);
-        }
+        },
+        complete: $().hideProgress
       })
     } else {
       $().populateTrailList( data[trailListUrl] );
@@ -130,6 +136,7 @@ $.fn.getTrailUrls = function(){
 $.fn.checkForNewCommit = function(){
   $.ajax({
     url: 'https://api.github.com/repos/thoughtbot/trail-map/commits',
+    beforeSend: $().showProgress,
     success: function(commits, successCode, jqXHR){
       var current_commit = commits[0]['sha'];
       chrome.storage.local.get('lastCommitSha', function(last_commit){
@@ -142,6 +149,7 @@ $.fn.checkForNewCommit = function(){
     },
     complete: function(){
       $().getTrailUrls()
+      $().hideProgress()
     }
   });
 }
